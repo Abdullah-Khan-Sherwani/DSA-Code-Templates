@@ -10,9 +10,8 @@ class BST {
 		Node* right;                                                            // Right tree with larger values
 		Node* left;                                                             // left tree with smaller values
 		int count;                                                              // Node count to keep track of subtree size
-        int height;                                                             // Counts depth of the tree
-        
-		Node(Key k, Value v, int c) : key(k), val(v), right(nullptr), left(nullptr), count(c), height(0) {}
+
+		Node(Key k, Value v, int c) : key(k), val(v), right(nullptr), left(nullptr), count(c) {}
 		Node(Key k, Value v) : key(k), val(v), right(nullptr), left(nullptr), count(1) {}
 		Node() : right(nullptr), left(nullptr), count(0) {}
 	};
@@ -20,7 +19,7 @@ class BST {
 	Node* root;
 
 	Node* put(Node* x, Key key, Value val) {
-		if (x == nullptr) return new Node(key, val, 1);                         // if x is null, return a new node with default count of 1
+		if (x == nullptr) return new Node(key, val, 1);                            // if x is null, return a new node with default count of 1
 
 		if (key < x->key) {
 			x->left = put(x->left, key, val);                                   // go left if key is smaller than x and update left pointer
@@ -31,7 +30,6 @@ class BST {
 		}
 
 		x->count = 1 + size(x->left) + size(x->right);                          // Update the count of the current node
-		x->height = height(x);                                                  // Update height of the tree
 		return x;                                                               // Return the updated node
 	}
 
@@ -98,74 +96,8 @@ class BST {
 
 		// If no closer match in the left subtree, the current node is the ceil
 		return x;
+
 	}
-	
-	Node* removeMin(Node* x) {
-        if (x->left == nullptr) {
-            Node* right = x->right;
-            delete x;
-            return right;
-        }
-        x->left  = removeMin(x->left);
-
-        x->count = 1 + size(x->left) + size(x->right);
-        x->height = height(x);
-        return x;
-    }
-    
-    Node* removeMax(Node* x) {
-		if (x->right == nullptr) {
-			Node* left = x->left;
-			delete x;
-			return left;
-		}
-		x->right = removeMax(x->right);
-
-		x->count = 1 + size(x->left) + size(x->right);
-		x->height = height(x);
-		return x;
-	}
-	
-	Node* remove(Node* x, const Key& key) {
-    if (x == nullptr) return nullptr;                                           // Base case: key not found, return null
-
-    if (key < x->key) 
-        x->left  = remove(x->left, key);                                        // Go left to find the key
-    else if (x->key < key) 
-        x->right = remove(x->right, key);                                       // Go right to find the key
-    else { 
-        // Node with the key found
-        if (x->right == nullptr) return x->left;                                // Only left child or no child
-        if (x->left == nullptr) return x->right;                                // Only right child
-
-        Node* t = x;                                                            // Temporarily store the node to be deleted
-        x = min(t->right);                                                      // Find the minimum node in the right subtree
-        x->right = deleteMin(t->right);                                         // Delete the minimum node from the right subtree
-        x->left = t->left;                                                      // Attach the left child
-    } 
-
-    x->count = size(x->left) + size(x->right) + 1;                              // Update count
-    x->height = height(x);                                                      // Update height
-    return x;                                                                   // Return the updated node
-}
-    
-    Node* select(Node* x, int k) {
-        if (x == nullptr) return nullptr; 
-
-        int t = size(x->left); 
-        if (t > k)
-            return select(x->left,  k);
-        else if (t < k)
-            return select(x->right, k-t-1);
-        else
-            return x; 
-    }
-    
-    int height (Node* x) {
-		if (x == nullptr) return -1;
-		
-		return 1 + std::max(height(x->right), height(x->left));
-    }
 
 public:
 	BST() : root(nullptr) {}
@@ -211,68 +143,147 @@ public:
 		inorder(root, keyList);
 		return keyList;
 	}
-	
-	int height() {
-		return root->height;
-	}
-	
-	void removeMax() {
-		if (root == nullptr) throw std::out_of_range("Symbol table underflow");
-		root = removeMax(root);
-	}
-	
-	Key max() {
-		return max(root);
-	}
-	
-	void removeMin() {  
-        if(root == nullptr) throw std::out_of_range("Symbol table underflow");
-        root = removeMin(root);  
-    }
-
-    void remove(const Key& key) {  
-        root = remove(root, key);  
-    }
-    
-    Key min() {   //Returns the smallest key in the BST.
-        if (root == nullptr) throw std::out_of_range("called min() with empty symbol table");
-        Node* x = root;
-        while (x->left != nullptr) x = x->left;
-        return x->key;
-    }
-    
-    Key max() {
-        if (root == nullptr) throw std::out_of_range("called max() with empty symbol table");
-        Node* traverse = root;
-        while (traverse->right != nullptr) {
-            traverse = traverse->right;
-        }
-        return traverse->key;                                                   // Return the maximum key
-    }
-    
-    Key select(int k) {                                                         //Returns the key with a specified rank k.
-        if (k < 0 || k >= size()) 
-            throw std::out_of_range("called select() with invalid argument"); 
-
-        Node* x = select(root, k);
-        return x->key;
-    } 
-    
-    Value& operator[](const Key& key) {                                         //Accesses or inserts the value for a given key. If the key doesn't exist, it inserts a new node with a default value.
-        if (root == nullptr)         
-            root = new Node(key, Value());
-
-        Node* x = root;
-        while(true) {
-            if (key < x->key) {
-                if(x->left==nullptr) x->left = new Node(key, Value());
-                x = x->left;
-            }
-            else if (x->key < key) {
-                if(x->right==nullptr) x->right = new Node(key, Value());
-                x = x->right;       
-            }
-            else return x->val;
-        }
-    } 
 };
+
+
+
+/*#include <iostream>
+#include <vector>
+
+template<typename Key, typename Value>
+class BST {
+	struct Node {
+		Key key;
+		Value val;
+		Node* right;                                                            // Right tree with larger values
+		Node* left;                                                             // left tree with smaller values
+		int count
+
+		Node(Key k, Value v, count c) : key(k), val(v), right(nullptr), left(nullptr), count(c) {}
+		Node(Key k, Value v) : key(k), val(v), right(nullptr), left(nullptr), count(1) {}
+		Node() : right(nullptr), left(nullptr), count(0) {}
+	};
+
+	Node* root;
+
+	Node* put(Node* x, Key key, Value val) {
+		if(x == nullptr) return new Node(key, val, 1);                          // if x null return a new node which will connect with the remaining nodes
+
+		if(key < x->key) return put(x->left, key, val);                         // go left if key is smaller than x
+		else if(key > x->key) return put(x->right, key, val);                   // go right if key is greater than x
+		else x->val = val;                                                      // Overwrite x's value if it already exists
+		x->count = 1 + size(x->left) + size(x->right);
+		return x;                                                               // Due to else statement just returns the same node with the value changed
+	}
+
+	size_t size(Node* x) {
+		if(x == nullptr) return 0;
+		return x->count;
+	}
+
+	int rank(Key key, Node x) {
+		if(x == nullptr) return 0;
+
+		if(key > x->key) return 1 + size(x->left) + rank(key, x->right);
+		else if(key < x->key) return rank(key, x->left);
+		else return size(x->left);
+	}
+
+	void inorder(Node* x, std::vector<Key> keys) {
+		if(x == nullptr) return;
+
+		inorder(x->left, keys);
+		keys.push_back(x->key);
+		inorder(x->right, keys);
+	}
+
+	Node* Floor(Node x, Key key) {
+		// Base case: if the current node is null, no floor can be found
+		if (x == nullptr) return nullptr;
+
+		// If we find the exact key, this node is the floor
+		if (x->key == key) return x;
+
+		// If the current node's key is greater than the target key,
+		// search in the left subtree, where smaller keys are located
+		if (x->key > key) return Floor(x->left, key);
+
+		// If the current node's key is less than the target key,
+		// search in the right subtree for a closer match
+		Node* t = Floor(x->right, key);
+
+		// If a valid floor was found in the right subtree, return it
+		if (t != nullptr) return t;
+
+		// If no closer match in the right subtree, the current node is the floor
+		return x;
+	}
+	Node* Ceil(Node x, Key key) {
+		// Base case: if the current node is null, no ceil can be found
+		if (x == nullptr) return nullptr;
+
+		// If we find the exact key, this node is the ceil
+		if (x->key == key) return x;
+
+		// If the current node's key is less than the target key,
+		// search in the right subtree, where larger keys are located
+		if (x->key < key) return Ceil(x->right, key);
+
+		// If the current node's key is greater than the target key,
+		// search in the left subtree for a closer match
+		Node* t = Ceil(x->left, key);
+
+		// If a valid ceil was found in the left subtree, return it
+		if (t != nullptr) return t;
+
+		// If no closer match in the left subtree, the current node is the ceil
+		return x;
+
+	}
+
+public:
+	BST(Key k, Value v) : root(k, v) {}
+	BST() {}
+
+	void put(Key key, Value val) {
+		root = put(root, key, val);
+	}
+
+	Value get(Key key) {
+		Node* x = root;
+
+		while(x != nullptr) {
+			if(key < x) x = x->left;
+			else if(key > x) x = x->right;
+			else return x->val;
+		}
+
+		return std::out_of_range("Value Not Found");
+	}
+
+	size_t size() {
+		return size(root);
+	}
+
+	int rank(Key key) {
+		return rank(key, root);
+	}
+
+	Key Floor(Key key) {
+		Node* x = Floor(root, key);
+		if(x == nullptr) throw std::out_of_range("Tree empty");
+		else return x->key;
+	}
+
+	Key Ceil(Key key){
+	    Node* x = Ceil(root, key);
+	    if(x == nullptr) throw std::out_of_range("Tree Empty");
+	    else return x->key;
+	}
+
+	std::vector<Keys> keys() {
+		std::vector<key> keyList;
+		inorder(root, keyList);
+		return keyList;
+	}
+};*/
