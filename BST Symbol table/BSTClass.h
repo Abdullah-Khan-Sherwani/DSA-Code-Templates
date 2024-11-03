@@ -221,10 +221,6 @@ public:
 		root = removeMax(root);
 	}
 	
-	Key max() {
-		return max(root);
-	}
-	
 	void removeMin() {  
         if(root == nullptr) throw std::out_of_range("Symbol table underflow");
         root = removeMin(root);  
