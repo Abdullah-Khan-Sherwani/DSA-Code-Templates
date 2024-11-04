@@ -115,6 +115,33 @@ int main() {
     }
     std::cout << "Test 9 passed." << std::endl;
 
+    // Test 10: Removal of Nodes
+    std::cout << "\nTest 10: Removal of Nodes" << std::endl;
+    bst.remove(1);  // Remove leaf node
+    assert(bst.size() == 6);
+    assert(bst.keys() == std::vector<int>({3, 4, 5, 6, 7, 8}));
+    std::cout << "Removed leaf node (1) successfully." << std::endl;
+
+    bst.remove(3);  // Remove node with one child
+    assert(bst.size() == 5);
+    assert(bst.keys() == std::vector<int>({4, 5, 6, 7, 8}));
+    std::cout << "Removed node with one child (3) successfully." << std::endl;
+    
+    std::vector<int> watch = bst.keys();
+    bst.remove(5);  // Remove node with two children
+    assert(bst.size() == 4);
+    std::cout<< "wait";
+    assert(bst.keys() == std::vector<int>({4, 6, 7, 8}));
+    std::cout << "Removed node with two children (5) successfully." << std::endl;
+
+    try {
+        bst.get(5);
+        assert(false);  // Should not reach here; 5 was removed
+    } catch (const std::out_of_range&) {
+        std::cout << "Node (5) correctly no longer in tree." << std::endl;
+    }
+    std::cout << "Test 10 passed." << std::endl;
+
     std::cout << "All tests passed successfully!" << std::endl;
     return 0;
 }

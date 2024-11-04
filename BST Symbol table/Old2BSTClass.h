@@ -10,8 +10,8 @@ class BST {
 		Node* right;                                                            // Right tree with larger values
 		Node* left;                                                             // left tree with smaller values
 		int count;                                                              // Node count to keep track of subtree size
-		int height;                                                             // Counts depth of the tree
-
+        int height;                                                             // Counts depth of the tree
+        
 		Node(Key k, Value v, int c) : key(k), val(v), right(nullptr), left(nullptr), count(c), height(0) {}
 		Node(Key k, Value v) : key(k), val(v), right(nullptr), left(nullptr), count(1) {}
 		Node() : right(nullptr), left(nullptr), count(0) {}
@@ -99,21 +99,21 @@ class BST {
 		// If no closer match in the left subtree, the current node is the ceil
 		return x;
 	}
-
+	
 	Node* removeMin(Node* x) {
-		if (x->left == nullptr) {
-			Node* right = x->right;
-			delete x;
-			return right;
-		}
-		x->left  = removeMin(x->left);
+        if (x->left == nullptr) {
+            Node* right = x->right;
+            delete x;
+            return right;
+        }
+        x->left  = removeMin(x->left);
 
-		x->count = 1 + size(x->left) + size(x->right);
-		x->height = height(x);
-		return x;
-	}
-
-	Node* removeMax(Node* x) {
+        x->count = 1 + size(x->left) + size(x->right);
+        x->height = height(x);
+        return x;
+    }
+    
+    Node* removeMax(Node* x) {
 		if (x->right == nullptr) {
 			Node* left = x->left;
 			delete x;
@@ -125,69 +125,47 @@ class BST {
 		x->height = height(x);
 		return x;
 	}
-
-	Node* min(Node* x) {
-		if (x == nullptr) throw std::out_of_range("called min() with empty symbol table");
-		while (x->left != nullptr) x = x->left;
-		return x;
-	}
-
-	Node* max(Node* x) {
-		if(x == nullptr) throw std::out_of_range("called max() with empty symbol table");
-		while (x->right != nullptr) x = x->right;
-		return x;
-	}
-
+	
 	Node* remove(Node* x, const Key& key) {
-		if (x == nullptr) return nullptr;
+    if (x == nullptr) return nullptr;                                           // Base case: key not found, return null
 
-		if (key < x->key) {
-			x->left = remove(x->left, key);
-		} else if (key > x->key) {
-			x->right = remove(x->right, key);
-		} else {
-			// Key found, proceed with deletion
-			if (x->left == nullptr) {  // No left child
-				Node* temp = x->right;
-				delete x;  // Free memory of the current node
-				return temp;
-			}
-			if (x->right == nullptr) {  // No right child
-				Node* temp = x->left;
-				delete x;  // Free memory of the current node
-				return temp;
-			}
+    if (key < x->key) 
+        x->left  = remove(x->left, key);                                        // Go left to find the key
+    else if (x->key < key) 
+        x->right = remove(x->right, key);                                       // Go right to find the key
+    else { 
+        // Node with the key found
+        if (x->right == nullptr) return x->left;                                // Only left child or no child
+        if (x->left == nullptr) return x->right;                                // Only right child
 
-			// Node with two children
-			Node* minNode = min(x->right);  // Find successor
-			x->key = minNode->key;          // Copy successor's key
-			x->val = minNode->val;          // Copy successor's value
-			x->right = remove(x->right, minNode->key);  // Remove successor node
-		}
+        Node* t = x;                                                            // Temporarily store the node to be deleted
+        x = min(t->right);                                                      // Find the minimum node in the right subtree
+        x->right = deleteMin(t->right);                                         // Delete the minimum node from the right subtree
+        x->left = t->left;                                                      // Attach the left child
+    } 
 
-		// Recompute metadata (size and height)
-		x->count = 1 + size(x->left) + size(x->right);
-		x->height = height(x);
-		return x;
-	}
+    x->count = size(x->left) + size(x->right) + 1;                              // Update count
+    x->height = height(x);                                                      // Update height
+    return x;                                                                   // Return the updated node
+}
+    
+    Node* select(Node* x, int k) {
+        if (x == nullptr) return nullptr; 
 
-	Node* select(Node* x, int k) {
-		if (x == nullptr) return nullptr;
-
-		int t = size(x->left);
-		if (t > k)
-			return select(x->left,  k);
-		else if (t < k)
-			return select(x->right, k-t-1);
-		else
-			return x;
-	}
-
-	int height (Node* x) {
+        int t = size(x->left); 
+        if (t > k)
+            return select(x->left,  k);
+        else if (t < k)
+            return select(x->right, k-t-1);
+        else
+            return x; 
+    }
+    
+    int height (Node* x) {
 		if (x == nullptr) return -1;
-
+		
 		return 1 + std::max(height(x->right), height(x->left));
-	}
+    }
 
 public:
 	BST() : root(nullptr) {}
@@ -233,64 +211,64 @@ public:
 		inorder(root, keyList);
 		return keyList;
 	}
-
+	
 	int height() {
 		return root->height;
 	}
-
+	
 	void removeMax() {
 		if (root == nullptr) throw std::out_of_range("Symbol table underflow");
 		root = removeMax(root);
 	}
+	
+	void removeMin() {  
+        if(root == nullptr) throw std::out_of_range("Symbol table underflow");
+        root = removeMin(root);  
+    }
 
-	void removeMin() {
-		if(root == nullptr) throw std::out_of_range("Symbol table underflow");
-		root = removeMin(root);
-	}
+    void remove(const Key& key) {  
+        root = remove(root, key);  
+    }
+    
+    Key min() {   //Returns the smallest key in the BST.
+        if (root == nullptr) throw std::out_of_range("called min() with empty symbol table");
+        Node* x = root;
+        while (x->left != nullptr) x = x->left;
+        return x->key;
+    }
+    
+    Key max() {
+        if (root == nullptr) throw std::out_of_range("called max() with empty symbol table");
+        Node* traverse = root;
+        while (traverse->right != nullptr) {
+            traverse = traverse->right;
+        }
+        return traverse->key;                                                   // Return the maximum key
+    }
+    
+    Key select(int k) {                                                         //Returns the key with a specified rank k.
+        if (k < 0 || k >= size()) 
+            throw std::out_of_range("called select() with invalid argument"); 
 
-	void remove(const Key& key) {
-		root = remove(root, key);
-	}
+        Node* x = select(root, k);
+        return x->key;
+    } 
+    
+    Value& operator[](const Key& key) {                                         //Accesses or inserts the value for a given key. If the key doesn't exist, it inserts a new node with a default value.
+        if (root == nullptr)         
+            root = new Node(key, Value());
 
-	Key min() {   //Returns the smallest key in the BST.
-		if (root == nullptr) throw std::out_of_range("called min() with empty symbol table");
-		Node* x = root;
-		while (x->left != nullptr) x = x->left;
-		return x->key;
-	}
-
-	Key max() {
-		if (root == nullptr) throw std::out_of_range("called max() with empty symbol table");
-		Node* traverse = root;
-		while (traverse->right != nullptr) {
-			traverse = traverse->right;
-		}
-		return traverse->key;                                                   // Return the maximum key
-	}
-
-	Key select(int k) {                                                         //Returns the key with a specified rank k.
-		if (k < 0 || k >= size())
-			throw std::out_of_range("called select() with invalid argument");
-
-		Node* x = select(root, k);
-		return x->key;
-	}
-
-	Value& operator[](const Key& key) {                                         //Accesses or inserts the value for a given key. If the key doesn't exist, it inserts a new node with a default value.
-		if (root == nullptr)
-			root = new Node(key, Value());
-
-		Node* x = root;
-		while(true) {
-			if (key < x->key) {
-				if(x->left==nullptr) x->left = new Node(key, Value());
-				x = x->left;
-			}
-			else if (x->key < key) {
-				if(x->right==nullptr) x->right = new Node(key, Value());
-				x = x->right;
-			}
-			else return x->val;
-		}
-	}
+        Node* x = root;
+        while(true) {
+            if (key < x->key) {
+                if(x->left==nullptr) x->left = new Node(key, Value());
+                x = x->left;
+            }
+            else if (x->key < key) {
+                if(x->right==nullptr) x->right = new Node(key, Value());
+                x = x->right;       
+            }
+            else return x->val;
+        }
+    } 
 };
