@@ -2,6 +2,7 @@
 #include <vector>
 #include <stdexcept>
 
+// INCOMPLETE
 template<typename Key, typename Value>
 class LLRB {
     static const bool RED = true;
@@ -158,6 +159,7 @@ class LLRB {
 		return x;
 	}
 	
+	// MEMORY LEAK ISSUES
 	Node* remove(Node* x, const Key& key) {
     if (x == nullptr) return nullptr;                                           // Base case: key not found, return null
 
