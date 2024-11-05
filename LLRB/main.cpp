@@ -141,6 +141,17 @@ void testLLRB() {
     }
 
     std::cout << "All tests passed!" << std::endl;
+    
+    /*LLRB<int, std::string> empty;
+    empty.put(1, "one");
+    empty.put(2, "two");
+    //std::cout << empty.size();
+    empty.remove(1);
+    empty.remove(2);
+    std::vector<int> checker = empty.keys();
+    for(auto& elem : checker){
+        std::cout << elem << "\t";
+    }*/
 }
 
 int main() {

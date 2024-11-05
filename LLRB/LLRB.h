@@ -170,7 +170,8 @@ class LLRB {
 				return temp;
 			}
 
-			/*Node* t = x;
+			/*// Exception on root
+			Node* t = x;
       		x = min(t->right);  // See page 407.
       		x->right = removeMin(t->right);
       		x->left = t->left;
