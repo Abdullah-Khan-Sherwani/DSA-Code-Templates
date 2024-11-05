@@ -58,46 +58,24 @@ class BST {
 	}
 
 	Node* Floor(Node* x, Key key) {
-		// Base case: if the current node is null, no floor can be found
-		if (x == nullptr) return nullptr;
+		if (x == nullptr) return nullptr;										// Base case: if the current node is null, no floor can be found
 
-		// If we find the exact key, this node is the floor
-		if (x->key == key) return x;
+		if (x->key == key) return x;											// If we find the exact key, this node is the floor
+		if (x->key > key) return Floor(x->left, key);							// If the current node's key is greater than the target key, search in the left subtree, where smaller keys are located
 
-		// If the current node's key is greater than the target key,
-		// search in the left subtree, where smaller keys are located
-		if (x->key > key) return Floor(x->left, key);
-
-		// If the current node's key is less than the target key,
-		// search in the right subtree for a closer match
-		Node* t = Floor(x->right, key);
-
-		// If a valid floor was found in the right subtree, return it
-		if (t != nullptr) return t;
-
-		// If no closer match in the right subtree, the current node is the floor
-		return x;
+		Node* t = Floor(x->right, key);											// If the current node's key is less than the target key, search in the right subtree for a closer match
+		if (t != nullptr) return t;												// If a valid floor was found in the right subtree, return it
+		return x;																// If no closer match in the right subtree, the current node is the floor
 	}
 	Node* Ceil(Node* x, Key key) {
-		// Base case: if the current node is null, no ceil can be found
-		if (x == nullptr) return nullptr;
+		if (x == nullptr) return nullptr;										// Base case: if the current node is null, no ceil can be found
 
-		// If we find the exact key, this node is the ceil
-		if (x->key == key) return x;
+		if (x->key == key) return x;											// If we find the exact key, this node is the ceil
+		if (x->key < key) return Ceil(x->right, key);							// If the current node's key is less than the target key, search in the right subtree, where larger keys are located
 
-		// If the current node's key is less than the target key,
-		// search in the right subtree, where larger keys are located
-		if (x->key < key) return Ceil(x->right, key);
-
-		// If the current node's key is greater than the target key,
-		// search in the left subtree for a closer match
-		Node* t = Ceil(x->left, key);
-
-		// If a valid ceil was found in the left subtree, return it
-		if (t != nullptr) return t;
-
-		// If no closer match in the left subtree, the current node is the ceil
-		return x;
+		Node* t = Ceil(x->left, key);											// If the current node's key is greater than the target key, search in the left subtree for a closer match
+		if (t != nullptr) return t;												// If a valid ceil was found in the left subtree, return it
+		return x;																// If no closer match in the left subtree, the current node is the ceil
 	}
 
 	Node* removeMin(Node* x) {
@@ -126,18 +104,6 @@ class BST {
 		return x;
 	}
 
-	Node* min(Node* x) {
-		if (x == nullptr) throw std::out_of_range("called min() with empty symbol table");
-		while (x->left != nullptr) x = x->left;
-		return x;
-	}
-
-	Node* max(Node* x) {
-		if(x == nullptr) throw std::out_of_range("called max() with empty symbol table");
-		while (x->right != nullptr) x = x->right;
-		return x;
-	}
-
 	Node* remove(Node* x, const Key& key) {
 		if (x == nullptr) return nullptr;
 
@@ -158,8 +124,13 @@ class BST {
 				return temp;
 			}
 
+			/*Node* t = x;
+      		x = min(t->right);  // See page 407.
+      		x->right = removeMin(t->right);
+      		x->left = t->left;
+			delete t;*/
 			// Node with two children
-			Node* minNode = min(x->right);  // Find successor
+			Node* minNode = min(x->right);  // Find successor minimum in right subtree
 			x->key = minNode->key;          // Copy successor's key
 			x->val = minNode->val;          // Copy successor's value
 			x->right = remove(x->right, minNode->key);  // Remove successor node
@@ -168,6 +139,18 @@ class BST {
 		// Recompute metadata (size and height)
 		x->count = 1 + size(x->left) + size(x->right);
 		x->height = height(x);
+		return x;
+	}
+
+	Node* min(Node* x) {
+		if (x == nullptr) throw std::out_of_range("called min() with empty symbol table");
+		while (x->left != nullptr) x = x->left;
+		return x;
+	}
+
+	Node* max(Node* x) {
+		if(x == nullptr) throw std::out_of_range("called max() with empty symbol table");
+		while (x->right != nullptr) x = x->right;
 		return x;
 	}
 
