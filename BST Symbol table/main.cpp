@@ -128,12 +128,12 @@ int main() {
     assert(bst.keys() == std::vector<int>({4, 5, 6, 7, 8}));
     std::cout << "Removed node with one child (3) successfully." << std::endl;
     
-    /*std::vector<int> watch = bst.keys();
+    std::vector<int> watch = bst.keys();
     bst.remove(5);  // Remove node with two children
     assert(bst.size() == 4);
     std::cout<< "wait";
     assert(bst.keys() == std::vector<int>({4, 6, 7, 8}));
-    std::cout << "Removed node with two children (5) successfully." << std::endl;*/
+    std::cout << "Removed node with two children (5) successfully." << std::endl;
 
     try {
         bst.get(5);

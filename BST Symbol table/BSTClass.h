@@ -81,7 +81,7 @@ class BST {
 	Node* removeMin(Node* x) {
 		if (x->left == nullptr) {
 			Node* right = x->right;
-			delete x;
+			//delete x;
 			return right;
 		}
 		x->left  = removeMin(x->left);
@@ -95,7 +95,7 @@ class BST {
 	Node* removeMax(Node* x) {
 		if (x->right == nullptr) {
 			Node* left = x->left;
-			delete x;
+			//delete x;
 			return left;
 		}
 		x->right = removeMax(x->right);
@@ -125,17 +125,11 @@ class BST {
 				return temp;
 			}
 			
-			/*// Exception on root
 			Node* t = x;
       		x = min(t->right);  // See page 407.
       		x->right = removeMin(t->right);
       		x->left = t->left;
-			delete t;*/
-			// Node with two children
-			Node* minNode = min(x->right);  // Find successor minimum in right subtree
-			x->key = minNode->key;          // Copy successor's key
-			x->val = minNode->val;          // Copy successor's value
-			x->right = remove(x->right, minNode->key);  // Remove successor node
+			delete t;
 		}
 
 		// Recompute metadata (size and height)
