@@ -105,14 +105,12 @@ class BST
 		return x;	  // If no closer match in the left subtree, the current node is the ceil
 	}
 
-	// NOT USED IN PUBLIC REMOVE MIN
-	// Helper function for remove
 	Node *removeMin(Node *x)
 	{
 		if (x->left == nullptr)
 		{
 			Node *right = x->right;
-			// delete x;
+			//delete x;
 			return right;
 		}
 		x->left = removeMin(x->left);
@@ -121,14 +119,14 @@ class BST
 		x->height = height(x);
 		return x;
 	}
-	// NOT USED IN PUBLIC REMOVE MAX
-	// Helper function for remove
+
+	// modify delete x node into public function to avoid memory leak
 	Node *removeMax(Node *x)
 	{
 		if (x->right == nullptr)
 		{
 			Node *left = x->left;
-			// delete x;
+			delete x;
 			return left;
 		}
 		x->right = removeMax(x->right);
@@ -157,24 +155,36 @@ class BST
 			if (x->left == nullptr)
 			{ // No left child
 				Node *temp = x->right;
-				delete x; // Free memory of the current node
+				delete x;
 				return temp;
 			}
 			if (x->right == nullptr)
 			{ // No right child
 				Node *temp = x->left;
-				delete x; // Free memory of the current node
+				delete x;
 				return temp;
 			}
 
-			Node *t = x;
-			x = min(t->right); 
-			x->right = removeMin(t->right);
-			x->left = t->left;
-			delete t;
+			// Node with two children
+			Node *successor = min(x->right); // Find successor (minimum node in right subtree)
+
+			// Save the pointers of the node to be deleted
+			Node *rightSubtree = removeMin(x->right); // Remove the successor node from the right subtree
+			Node *leftSubtree = x->left;			  // Left subtree remains the same
+
+			// Replace x with its successor
+			successor->left = leftSubtree;
+			successor->right = rightSubtree;
+
+			// Update count and height for the successor node after restructuring
+			successor->count = 1 + size(successor->left) + size(successor->right);
+			successor->height = height(successor);
+
+			delete x;		  // Free the memory of the deleted node
+			return successor; // Return the new root of the subtree
 		}
 
-		// Recompute metadata (size and height)
+		// Update count and height after deletion
 		x->count = 1 + size(x->left) + size(x->right);
 		x->height = height(x);
 		return x;
