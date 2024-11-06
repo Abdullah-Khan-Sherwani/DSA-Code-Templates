@@ -91,6 +91,7 @@ class BST {
 		return x;
 	}
 
+	// modify delete x node into public function to avoid memory leak
 	Node* removeMax(Node* x) {
 		if (x->right == nullptr) {
 			Node* left = x->left;
