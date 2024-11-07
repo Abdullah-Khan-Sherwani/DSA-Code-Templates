@@ -36,9 +36,12 @@ class LLRB
 
     void flipColors(Node *h)
     {
-        h->color = RED;
-        h->left->color = BLACK;
-        h->right->color = BLACK;
+        if (h != nullptr)
+            h->color = RED;
+        if (h->left != nullptr)
+            h->left->color = BLACK;
+        if (h->right != nullptr)
+            h->right->color = BLACK;
     }
 
     Node *rotateLeft(Node *h)
@@ -179,6 +182,12 @@ class LLRB
     Node *balance(Node *h)
     {
         if (isRed(h->right))
+            h = rotateLeft(h);
+        h->count = 1 + size(h->left) + size(h->right); // Update the count of the current node
+        h->height = height(h);
+
+        return h;
+        /*if (isRed(h->right))
         {
             h = rotateLeft(h);
         }
@@ -194,7 +203,7 @@ class LLRB
 
         h->count = 1 + size(h->right) + size(h->left);
         h->height = height(h);
-        return h;
+        return h;*/
     }
 
     Node *min(Node *x)
@@ -215,42 +224,67 @@ class LLRB
         return x;
     }
 
-    Node *removeMin(Node *h)
+    Node *moveRedLeft(Node *h)
     {
         if (h == nullptr)
-            return nullptr; // Return if h is nullptr
+            return h;
 
-        if (h->left == nullptr) // If left is null, this is the minimum node
+        flipColors(h);
+        if (isRed(h->right->left))
         {
-            delete h;
-            return nullptr;
-        }
-
-        if (!isRed(h->left) && !isRed(h->left->left)) // Ensure red link on the left
-        {
+            h->right = rotateRight(h->right);
             h = rotateLeft(h);
         }
 
-        h->left = removeMin(h->left);
-        return balance(h);
+        return h;
+    }
+
+    Node *moveRedRight(Node *h)
+    {
+        if (h == nullptr)
+            return h;
+
+        flipColors(h);
+        if (h->left != nullptr && h->left->left != nullptr && !isRed(h->left->left))
+            h = rotateRight(h);
+
+        return h;
+    }
+
+    Node *removeMin(Node *h)
+    {
+        if (h == nullptr)
+            return nullptr;
+
+        // If the left child is null, h is the minimum node
+        if (h->left == nullptr)
+        {
+            delete h; // free memory
+            return nullptr;
+        }
+
+        // Prepare for removal by making sure the left child is red
+        if (!isRed(h->left) && !isRed(h->left->left))
+        {
+            h = moveRedLeft(h);
+        }
+
+        h->left = removeMin(h->left); // Recur to the left
+        return balance(h);            // Rebalance to restore LLRB properties
     }
 
     Node *removeMax(Node *h)
     {
         if (h == nullptr)
-            return nullptr;
-
-        if (isRed(h->left)) // Ensure that the left link is red
-        {
+            return h;
+        if (isRed(h->left))
             h = rotateRight(h);
-        }
 
-        if (h->right == nullptr) // If right is null, this is the max node
-        {
-            delete h;
+        if (h->right == nullptr)
             return nullptr;
-        }
 
+        if (!isRed(h->right) && !isRed(h->right->left))
+            h = moveRedRight(h);
         h->right = removeMax(h->right);
         return balance(h);
     }
@@ -388,10 +422,19 @@ public:
         return root->height;
     }
 
+    bool isEmpty()
+    {
+        return root == nullptr;
+    }
+
     void removeMax()
     {
         if (root == nullptr)
             throw std::out_of_range("Symbol table underflow");
+
+        if (!isRed(root->left) && isRed(root->right))
+            root->color = RED;
+
         root = removeMax(root);
         if (root != nullptr)
             root->color = BLACK;
@@ -401,6 +444,10 @@ public:
     {
         if (root == nullptr)
             throw std::out_of_range("Symbol table underflow");
+
+        if (!isRed(root->left) && isRed(root->right))
+            root->color = RED;
+
         root = removeMin(root);
         if (root != nullptr)
             root->color = BLACK;

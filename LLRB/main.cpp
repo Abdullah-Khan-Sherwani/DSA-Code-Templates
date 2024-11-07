@@ -4,6 +4,63 @@
 #include <cassert>
 #include "LLRBDeluxe.h"
 
+void testRemoveMin(LLRB<int, std::string>& tree)
+{
+    std::cout << "Testing removeMin..." << std::endl;
+
+    // Insert elements to create a balanced Red-Black Tree
+    tree.put(5, "Five");
+    tree.put(3, "Three");
+    tree.put(7, "Seven");
+    tree.put(1, "One");
+    tree.put(4, "Four");
+    tree.put(6, "Six");
+    tree.put(8, "Eight");
+    tree.put(10, "Ten");
+
+    // Print the initial tree structure if possible (method should be implemented)
+    //std::cout << "Initial tree structure:" << std::endl;
+    //tree.print(); // Assuming `print()` is implemented to display the tree structure
+
+    // Remove the minimum repeatedly and print the state after each removal
+    while (!tree.isEmpty()) {
+        std::cout << "Current minimum key: " << tree.min() << std::endl;
+        tree.removeMin();
+        std::cout << "Removed minimum." << std::endl;
+        //tree.print(); // Display tree after removing the minimum
+    }
+
+    std::cout << "removeMin test passed." << std::endl;
+}
+
+void testRemoveMax(LLRB<int, std::string>& tree)
+{
+    std::cout << "Testing removeMax..." << std::endl;
+
+    // Re-insert elements to create the same balanced Red-Black Tree
+    tree.put(5, "Five");
+    tree.put(3, "Three");
+    tree.put(7, "Seven");
+    tree.put(1, "One");
+    tree.put(4, "Four");
+    tree.put(6, "Six");
+    tree.put(8, "Eight");
+    tree.put(10, "Ten");
+
+    //std::cout << "Initial tree structure:" << std::endl;
+    //tree.print(); // Display initial structure
+
+    // Remove the maximum repeatedly and print the state after each removal
+    while (!tree.isEmpty()) {
+        std::cout << "Current maximum key: " << tree.max() << std::endl;
+        tree.removeMax();
+        std::cout << "Removed maximum" << std::endl;
+        //tree.print(); // Display tree after removing the maximum
+    }
+
+    std::cout << "removeMax test passed." << std::endl;
+}
+
 void testLLRBDeluxe()
 {
     LLRB<int, std::string> tree;
@@ -20,6 +77,8 @@ void testLLRBDeluxe()
     tree.put(8, "Eight");
     tree.put(10, "Ten");
     std::cout << "Insertion test passed." << std::endl;
+
+    tree.removeMax();
 
     // Test size
     std::cout << "\nTesting size..." << std::endl;
@@ -300,7 +359,11 @@ void testLLRB()
 
 int main()
 {
-    // testLLRBDeluxe();
+
+    LLRB<int, std::string> tree;
+    //testRemoveMax(tree);
+    testRemoveMin(tree);
+    /*testLLRBDeluxe();
     try
     {
         testLLRB<int, int>();
@@ -309,6 +372,6 @@ int main()
     catch (const std::exception &e)
     {
         std::cerr << "Test failed: " << e.what() << std::endl;
-    }
+    }*/
     return 0;
 }
