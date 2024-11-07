@@ -302,6 +302,10 @@ public:
 		root = remove(root, key);
 	}
 
+	bool isEmpty(){
+		return root == nullptr;
+	}
+
 	Key min()
 	{ // Returns the smallest key in the BST.
 		if (root == nullptr)

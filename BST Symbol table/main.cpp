@@ -143,6 +143,11 @@ int main() {
     }
     std::cout << "Test 10 passed." << std::endl;
 
+    /*std::cout << "Test 11: removing everything\n";
+    while(!bst.isEmpty()){
+        bst.removeMax();
+    }*/
+
     std::cout << "All tests passed successfully!" << std::endl;
     return 0;
 }
