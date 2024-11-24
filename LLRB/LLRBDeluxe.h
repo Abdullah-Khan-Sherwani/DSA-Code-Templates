@@ -35,12 +35,54 @@ class LLRB
     }
 
     void flipColors(Node *h)
+	{
+		h->color = RED;
+		h->left->color = BLACK;
+		h->right->color = BLACK;
+	}
+
+    void NFlipColors(Node* h)
     {
-        if (h != nullptr)
+        h->color = BLACK;
+		h->left->color = RED;
+		h->right->color = RED;
+    }
+
+	Node *rotateLeft(Node *h)
+	{
+		if (h == nullptr)
+			return h;
+
+		Node *x = h->right;
+		h->right = x->left;
+		x->left = h;
+		x->color = h->color;
+		h->color = RED;
+		return x;
+	}
+
+	Node *rotateRight(Node *h)
+	{
+		if (h == nullptr)
+			return h;
+
+		Node *x = h->left;
+		h->left = x->right;
+		x->right = h;
+		x->color = h->color;
+		h->color = RED;
+		return x;
+	}
+
+    /*void flipColors(Node *h)
+    {
+        if (h != nullptr){
+            return;
+        }
             h->color = RED;
-        if (h->left != nullptr)
+        //if (h->left != nullptr)
             h->left->color = BLACK;
-        if (h->right != nullptr)
+        //if (h->right != nullptr)
             h->right->color = BLACK;
     }
 
@@ -86,7 +128,7 @@ class LLRB
         h->count = 1 + size(h->left) + size(h->right);
 
         return x; // x is the new root of the rotated subtree
-    }
+    }*/
 
     Node *put(Node *h, Key key, Value val)
     {
@@ -118,11 +160,12 @@ class LLRB
         return h;                                      // Return the updated node
     }
 
-    size_t size(Node *x)
+    size_t size(Node *x) /// MODIFIED
     {
         if (x == nullptr)
             return 0;
-        return x->count;
+
+        return 1 + size(x->right) + size(x->left);
     }
 
     int rank(Key key, Node *x)
@@ -180,9 +223,16 @@ class LLRB
     }
 
     Node *balance(Node *h)
-    {
+    {   
         if (isRed(h->right))
             h = rotateLeft(h);
+        if (isRed(h->right) && !isRed(h->left))
+            h = rotateLeft(h);
+        if (isRed(h->left) && isRed(h->left->left))
+            h = rotateRight(h);
+        if (isRed(h->right) && isRed(h->left))
+            NFlipColors(h);
+
         h->count = 1 + size(h->left) + size(h->right); // Update the count of the current node
         h->height = height(h);
 
@@ -229,7 +279,7 @@ class LLRB
         if (h == nullptr)
             return h;
 
-        flipColors(h);
+        NFlipColors(h);
         if (isRed(h->right->left))
         {
             h->right = rotateRight(h->right);
@@ -244,8 +294,8 @@ class LLRB
         if (h == nullptr)
             return h;
 
-        flipColors(h);
-        if (h->left != nullptr && h->left->left != nullptr && !isRed(h->left->left))
+        NFlipColors(h);
+        if (!isRed(h->left->left))
             h = rotateRight(h);
 
         return h;
@@ -270,6 +320,7 @@ class LLRB
         }
 
         h->left = removeMin(h->left); // Recur to the left
+        h->count = 1 + size(h->left) + size(h->right);
         return balance(h);            // Rebalance to restore LLRB properties
     }
 
@@ -277,6 +328,7 @@ class LLRB
     {
         if (h == nullptr)
             return h;
+
         if (isRed(h->left))
             h = rotateRight(h);
 
