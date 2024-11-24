@@ -83,9 +83,7 @@ public:
 private:
     void validateVertex(int v) {
         if (v < 0 || v >= V())
-            throw new invalid_argument("vertex " + std::to_string(v) + " is not between 0 and " + std::to_string((V()-1)));
+            throw invalid_argument("vertex " + std::to_string(v) + " is not between 0 and " + std::to_string((V()-1)));
     }
 
 };
-
-
